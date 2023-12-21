@@ -1,8 +1,8 @@
 package org.enjoy.agent;
 
-import jdk.internal.org.objectweb.asm.ClassReader;
-import jdk.internal.org.objectweb.asm.ClassVisitor;
-import jdk.internal.org.objectweb.asm.ClassWriter;
+import org.objectweb.asm.ClassReader;
+import org.objectweb.asm.ClassVisitor;
+import org.objectweb.asm.ClassWriter;
 import org.enjoy.asm.HandlerAdapter;
 import org.enjoy.asm.HandlerFilter;
 
