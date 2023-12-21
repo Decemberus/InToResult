@@ -3,6 +3,7 @@ package org.enjoy.agent;
 import jdk.internal.org.objectweb.asm.ClassReader;
 import jdk.internal.org.objectweb.asm.ClassVisitor;
 import jdk.internal.org.objectweb.asm.ClassWriter;
+import org.enjoy.asm.HandlerAdapter;
 import org.enjoy.asm.HandlerFilter;
 
 import java.lang.instrument.ClassFileTransformer;
@@ -28,7 +29,8 @@ public class AgentTransform implements ClassFileTransformer {
     public byte[] getByteCode(String className , byte[] classfilebuffer){
         ClassReader classReader = new ClassReader(classfilebuffer);
         ClassWriter classWriter = new ClassWriter(ClassWriter.COMPUTE_MAXS);
-        ClassVisitor classVisitor = new HandlerFilter();
+        ClassVisitor classVisitor = new HandlerAdapter(classWriter , className);
         classReader.accept(classVisitor,ClassReader.EXPAND_FRAMES);
+        return classWriter.toByteArray();
     }
 }
