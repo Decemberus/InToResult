@@ -53,7 +53,7 @@ public class HandlerAdapter extends ClassVisitor {
         if (methodVisitor == null){
             return null;
         }
-        return methodVisitor;
+        return new MyMethodVisitor(access, name, descriptor, methodVisitor, className, fullClazzName, simpleClassName);
 
     }
 }
