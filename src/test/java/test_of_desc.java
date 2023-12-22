@@ -1,4 +1,5 @@
 import org.junit.Test;
+import org.objectweb.asm.Type;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -15,6 +16,11 @@ public class test_of_desc {
             String block = m.group(1);
             System.out.println(block);
         }
+    }
+
+    @Test
+    public void asmwhat(){
+        System.out.println(Type.getInternalName(System.class));
     }
 }
 

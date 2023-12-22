@@ -61,7 +61,7 @@
                 <version>2.3.2</version>
                 <configuration>
                     <archive>
-                        <manifestFile>D:\Code_Project\Java\RASPUsage\src\main\resources\MAINFEST.NF</manifestFile>
+                        <manifestFile>D:\Code_Project\Java\ASM\src\main\resources\MANIFEST.MF</manifestFile>
                     </archive>
                 </configuration>
             </plugin>

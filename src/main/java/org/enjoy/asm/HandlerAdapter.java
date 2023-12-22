@@ -1,7 +1,7 @@
 package org.enjoy.asm;
 
-import jdk.internal.org.objectweb.asm.ClassVisitor;
-import jdk.internal.org.objectweb.asm.MethodVisitor;
+import org.objectweb.asm.ClassVisitor;
+import org.objectweb.asm.MethodVisitor;
 
 import static org.objectweb.asm.Opcodes.*;
 
@@ -11,7 +11,7 @@ public class HandlerAdapter extends ClassVisitor {
     private final String fullClazzName;
     private final String simpleClassName;
     private boolean isInterface;
-    public HandlerAdapter(ClassVisitor classVisitor, String className) {
+    public HandlerAdapter(final ClassVisitor classVisitor, String className) {
         super(ASM5, classVisitor);
         this.className = className;
         this.fullClazzName = className.replace('/','.');
