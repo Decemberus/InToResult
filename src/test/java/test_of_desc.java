@@ -21,6 +21,7 @@ public class test_of_desc {
     @Test
     public void asmwhat(){
         System.out.println(Type.getInternalName(System.class));
+        System.out.println(Type.getInternalName(Exception.class));
     }
 }
 

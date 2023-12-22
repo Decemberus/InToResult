@@ -41,10 +41,17 @@ public class MyMethodVisitor extends AdviceAdapter {
     /**
      *
      */
+    private Label from = new Label();
+    private Label to = new Label();
+    private Label target = new Label();
     @Override
     protected void onMethodEnter() {
+        //记录启动时间
         methodStartTime();
+        //记录方法入参信息
         methodParameter();
+        visitLabel(from);
+        visitTryCatchBlock(from,to,target,Type.getInternalName(Exception.class));
     }
 
     //创建long l = System.nanoTime();这一句语句
@@ -147,8 +154,6 @@ public class MyMethodVisitor extends AdviceAdapter {
 
         parameterIdentifier = newLocal(Type.LONG_TYPE);
         mv.visitVarInsn(ASTORE, parameterIdentifier);
-
-
     }
 
     /**
@@ -207,6 +212,77 @@ public class MyMethodVisitor extends AdviceAdapter {
                 visitVarInsn(DLOAD, currentLocal);
                 break;
         }
+    }
+    @Override
+    public void visitLocalVariable(String name, String descriptor, String signature, Label start, Label end, int index) {
+        super.visitLocalVariable(name, descriptor, signature, start, end, index);
+        int methodParameterIndex = isStaticMethod ? index : index - 1;  // 可以打印方法中所有入参的名称，这也可以用于后续自定义插针
+        if (0 <= methodParameterIndex && methodParameterIndex < parameterTypeList.size()) {
+            MethodMonitor.setMethodParameterGroup(methodId, name);
+        }
+    }
+    @Override
+    public void visitMaxs(int maxStack, int maxLocals) {
+        //标志：try块结束
+        mv.visitLabel(to);
+        //标志：catch块开始位置
+        mv.visitLabel(target);
+
+        // 设置visitFrame：mv.visitFrame(Opcodes.F_FULL, 4, new Object[]{"java/lang/String", Opcodes.INTEGER, Opcodes.LONG, "[Ljava/lang/Object;"}, 1, new Object[]{"java/lang/Exception"});
+        int nLocal = (isStaticMethod ? 0 : 1) + parameterTypeCount + (parameterTypeCount == 0 ? 1 : 2);
+        Object[] localObjs = new Object[nLocal];
+        int objIdx = 0;
+        if (!isStaticMethod) {
+            localObjs[objIdx++] = className;
+        }
+        for (String parameter : parameterTypeList) {
+            if ("Z".equals(parameter)) {
+                localObjs[objIdx++] = Opcodes.INTEGER;
+            } else if ("C".equals(parameter)) {
+                localObjs[objIdx++] = Opcodes.INTEGER;
+            } else if ("B".equals(parameter)) {
+                localObjs[objIdx++] = Opcodes.INTEGER;
+            } else if ("S".equals(parameter)) {
+                localObjs[objIdx++] = Opcodes.INTEGER;
+            } else if ("I".equals(parameter)) {
+                localObjs[objIdx++] = Opcodes.INTEGER;
+            } else if ("F".equals(parameter)) {
+                localObjs[objIdx++] = Opcodes.FLOAD;
+            } else if ("J".equals(parameter)) {
+                localObjs[objIdx++] = Opcodes.LONG;
+            } else if ("D".equals(parameter)) {
+                localObjs[objIdx++] = Opcodes.DOUBLE;
+            } else {
+                localObjs[objIdx++] = parameter;
+            }
+        }
+        localObjs[objIdx++] = Opcodes.LONG;
+        if (parameterTypeCount > 0) {
+            localObjs[objIdx] = "[Ljava/lang/Object;";
+        }
+        mv.visitFrame(Opcodes.F_FULL, nLocal, localObjs, 1, new Object[]{"java/lang/Exception"});
+
+        // 异常信息保存到局部变量
+        int local = newLocal(Type.LONG_TYPE);
+        System.out.println("xxxx:" + local);
+        mv.visitVarInsn(ASTORE, local);
+
+        // 输出参数
+        mv.visitVarInsn(LLOAD, startTimeIdentifier);
+        mv.visitLdcInsn(methodId);
+        if (parameterTypeList.isEmpty()) {
+            mv.visitInsn(ACONST_NULL);
+        } else {
+            mv.visitVarInsn(ALOAD, parameterIdentifier);
+        }
+        mv.visitVarInsn(ALOAD, local);
+        mv.visitMethodInsn(INVOKESTATIC, Type.getInternalName(MethodMonitor.class), "point", "(JI[Ljava/lang/Object;Ljava/lang/Throwable;)V", false);
+
+        // 抛出异常
+        mv.visitVarInsn(ALOAD, local);
+        mv.visitInsn(ATHROW);
+
+        super.visitMaxs(maxStack, maxLocals);
     }
 }
 

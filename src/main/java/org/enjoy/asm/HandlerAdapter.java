@@ -53,7 +53,8 @@ public class HandlerAdapter extends ClassVisitor {
         if (methodVisitor == null){
             return null;
         }
-        return new MyMethodVisitor(access, name, descriptor, methodVisitor, className, fullClazzName, simpleClassName);
+        //return new MyMethodVisitor(access, name, descriptor, methodVisitor, className, fullClazzName, simpleClassName);
+        return new ProfilingMethodVisitor(access, name, descriptor, methodVisitor, className, fullClazzName, simpleClassName);
 
     }
 }

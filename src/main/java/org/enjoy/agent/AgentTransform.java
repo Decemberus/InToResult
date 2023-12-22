@@ -35,6 +35,7 @@ public class AgentTransform implements ClassFileTransformer {
         ClassReader classReader = new ClassReader(classfilebuffer);
         ClassWriter classWriter = new ClassWriter(classReader,ClassWriter.COMPUTE_MAXS);
         ClassVisitor classVisitor = new HandlerAdapter(classWriter , className);
+        //accept会自动调用后面的classVisitor的方法
         classReader.accept(classVisitor,ClassReader.EXPAND_FRAMES);
         return classWriter.toByteArray();
     }
@@ -42,7 +43,7 @@ public class AgentTransform implements ClassFileTransformer {
         // 输出类字节码
         FileOutputStream out = null;
         try {
-            //String pathName = ProfilingTransformer.class.getResource("/").getPath() + className + "SQM.class";
+            //String pathName = ProfilingTransformer.class.getResource("/").getPath() + className + "";
             String pathName = "D:\\Code_Project\\Java\\ASM\\src\\main\\java\\org\\enjoy\\modifying\\NewClass.class";
             out = new FileOutputStream(new File(pathName));
             System.out.println("ASM类输出路径：" + pathName);
